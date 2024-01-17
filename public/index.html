@@ -20,6 +20,13 @@
 
     <script src="scripts/app.js" type="module"></script>
 
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script>
+        function loginFromGoogle(data) {
+            Auth.loginFromGoogle(data)
+        }
+    </script>
+
 </head>
 
 <body>
