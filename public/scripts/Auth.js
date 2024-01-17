@@ -27,6 +27,7 @@ const Auth = {
                 name: user.name, //name is optional for PasswordCredential.
                 password: user.password,
             });
+            navigator.credentials.store(credentials);
         }
     },
     register: async (event) => {
@@ -43,23 +44,31 @@ const Auth = {
             alert(response.message);
         }
     },
+    loginFromGoogle: async (data) => {
+        const response = await API.loginFromGoogle({
+            credential: data
+        });
+        Auth.postLogin(response, {
+            name: response.name,
+            email: response.email,
+        });
+    },
     login: async (event) => {
         if (event) event.preventDefault(); //autologin does not have an event
-        const credentials = {
+        const user = {
             email: document.querySelector("#login_email").value,
             password: document.querySelector("#login_password").value,
         };
         //log in
-        const response = await Auth.login(credentials); 
+        const response = await API.login(user); 
         //using the response to grab the name, we can create the user object here. 
         Auth.postLogin(response, {
-            ...credentials,
+            ...user,
             name: response.name,
         });
 
     },
-    logout: async (event) => {
-        event.preventDefault();
+    logout: () => {
         Auth.isLoggedIn = false;
         Auth.account = null;
         Auth.updateStatus();
@@ -75,12 +84,18 @@ const Auth = {
             const credentials = await navigator.credentials.get({password: true})
             //depending on the use case, we can just call Auth.login(credentials) here,
             //or we can auto fill the login form and let the user click the login button.
-            document.querySelector("login_email").value = credentials.id;
-            document.querySelector("login_password").value = credentials.password;
-
-            //if we do call the login method, since we are not passing an event
-            //here, we need to check if an event exists, as done above.
-
+            if (credentials) {
+                try {
+                    document.querySelector("#login_email").value = credentials.id;
+                    document.querySelector("#login_password").value = credentials.password;
+                    //if we do call the login method, since we are not passing an event
+                    //here, we need to check if an event exists, as done above.
+                    Auth.login();
+                    
+                } catch (error) {
+                    
+                }
+            }
         }
     },
     updateStatus() {

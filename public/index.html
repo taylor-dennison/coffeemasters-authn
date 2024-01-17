@@ -71,10 +71,10 @@
                     <label for="register_name">Name</label>
                     <input id="register_name" required autocomplete='name'>
 
-                    <label for="register-email">Email Address</label>
+                    <label for="register_email">Email Address</label>
                     <!--For whatever credential is used to identify the account, in this case,
                     the email, always ensure that the autocomplete attribute is set to username, not email.  -->
-                    <input pid="register_email" required type="email" autocomplete='username'>
+                    <input id="register_email" required type="email" autocomplete='username'>
 
                     <label for='register_password'>Password</label>
                     <!-- In this case, since this is a registration form, the autocomplete attribute 
@@ -89,7 +89,7 @@
         <section class="page" id="login">
             <h2>Log In</h2>
 
-            <form id="formLogin" onsubmit="Auth.login(event)" >
+            <form id="formLogin" onsubmit="Auth.login(event)">
                 <fieldset>
                     <label for="login_email">Email</label>
                     <input id="login_email" required autocomplete='username'>
@@ -103,6 +103,21 @@
                 <p>
                     <a href="/register" class="navlink">Register a new account instead</a>
                 </p>
+
+                <fieldset>
+                    <!-- data-auto and data-itp are disabled to prevent google from automatically
+                    logging in the user.  -->
+                    <div id="g_id_onload"
+                        data-client_id="956594016023-42ohogvumsqrr9b55ovboc32p4qafnc0.apps.googleusercontent.com"
+                        data-context="signin" data-ux_mode="popup" data-callback="loginFromGoogle"
+                        
+                        data-auto_select="false" data-itp_support="false">
+                    </div>
+
+                    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                        data-text="signin_with" data-size="large" data-logo_alignment="left">
+                    </div>
+                </fieldset>
 
                 </fieldset>
             </form>

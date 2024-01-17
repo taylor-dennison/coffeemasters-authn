@@ -40,12 +40,11 @@ const findUser = (email) => {
 };
 
 app.post('/auth/login', (req, res) => {
-  const userFound = foundUser(req.body.email);
+  const userFound = findUser(req.body.email);
   if (!userFound) {
     res.status(401).send({ok: false, message: 'Credentials are wrong'});
     return;
   }
-
   //we have found the user. Check the password
   const passwordMatch = bcrypt.compareSync(req.body.password, userFound.password);
   if (!passwordMatch) {
@@ -57,6 +56,37 @@ app.post('/auth/login', (req, res) => {
   return res.status(200).send({ok: true, name: userFound.name, email: userFound.email});
 
 })
+
+app.post('/auth/login-google', (req, res) => {
+  let jwt = jwtJsDecode.jwtDecode(req.body.credential.credential);
+  let user = {
+    name: jwt.payload.name,
+    email: jwt.payload.email,
+    password: null,
+  };
+
+  //check if user already exists
+  const userFound = findUser(user.email);
+  if (userFound) {
+    // since we may have more than one federated login,
+    // we should use a federated object to store the information in the db that 
+    // could contain multiple federated logins.
+    user.federated = { 
+      google: jwt.payload.aud,
+    }; //google id from jwt
+    db.write();
+    res.send({ok: true, name: userFound.name, email: userFound.email});
+  } else {
+    db.data.users.push({
+      ...user,
+      federated: {
+        google: jwt.payload.aud,
+      },
+    });
+    db.write();
+    res.send({ok: true, name: userFound.name, email: userFound.email});
+  }
+});
 
 app.post('/auth/register', (req, res) => {
   //TODO: DATA VALIDATION + SANITIZATION
