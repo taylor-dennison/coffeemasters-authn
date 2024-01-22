@@ -21,6 +21,8 @@
     <script src="scripts/app.js" type="module"></script>
 
     <script src="https://accounts.google.com/gsi/client" async></script>
+    <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+
     <script>
         function loginFromGoogle(data) {
             Auth.loginFromGoogle(data)
@@ -93,10 +95,20 @@
                 <fieldset>
                     <label for="login_email">Email</label>
                     <input id="login_email" required autocomplete='username'>
-
-                    <label for="login_password">Password</label>
-                    <!-- Note the use of current-password for the actual login form -->
-                    <input type="password" id="login_password" autocomplete='current-password'>
+                    <section hidden id='login_section_password'>
+                        <label for="login_password">Password</label>
+                        <!-- Note the use of current-password for the actual login form -->
+                        <input type="password" id="login_password" autocomplete='current-password'>
+                    </section>
+                    <section hidden id='login_section_webauthn'>
+                        <!-- notice we are calling event.preventdefault() after calling our method.
+                            Since we have to supply the href with a value, we are using a #, which
+                            will cause the page to jump to the top, which is not what we want.
+                          -->
+                        <a href="#" class='navlink' onclick='Auth.webAuthnLogin(); event.preventDefault()'>
+                            Log in with WebAuthn / Passkey
+                        </a>
+                    </section>
                 </fieldset>
                 <button type='submit'>Continue</button>
 
@@ -132,7 +144,7 @@
                 <dt>Email</dt>
                 <dd class="account_username"></dd>
             </dl>
-
+            <button onclick='Auth.addWebAuthn()'>Add Authenticator / Passkey</button>
             <button onclick="Auth.logout()">Log out</button>
         </section>
     </main>
